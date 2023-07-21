@@ -1,8 +1,9 @@
-import { ClientOptions, IntentsBitField, Message, TextChannel } from "discord.js";
+import { ClientOptions, IntentsBitField, Message, PermissionFlagsBits, TextChannel } from "discord.js";
 
 const { Client, Events, GatewayIntentBits } = require('discord.js');
-
 const { token }: {token:string} = require("../config.json");
+
+import { botEcho } from "./echo";
 
 // Create new client instance
 
@@ -28,31 +29,21 @@ client.login(token);
 client.on(Events.MessageCreate, (m: Message) => {
     // Checks for a ! and executes a command, but prevented from calling commands on itself 
     if(m.content[0] === "!" && m.author.id !== "1126413831883718826" ) {
+
         const messageContent:string = m.content;
 
-        if(messageContent.slice(1,5) === "echo" ) {
-            
-            // Check if the second line is a text channel
-            const secondWord: string = messageContent.split(" ")[1];
-            const regex = new RegExp( "<#[0-9]*>" );
-            if( regex.test(secondWord) ) {
-                const channelToSendsnowflake: string = secondWord.slice(2, -1);
+        // Check if the member is an admin
+        if(m.member !== null) {
+            const isAdmin: boolean = m.member.permissions.has(PermissionFlagsBits.Administrator, true);
+            if (isAdmin) {
                 
-                const channelToSend: TextChannel = client.channels.cache.get( channelToSendsnowflake );
-                
-                if( typeof channelToSend === 'undefined' ) {
-                    m.channel.send( "Error: That channel does not exist or is in another server I don't have permission to access." );
-                    return;
-                }
-                channelToSend.send( messageContent.slice( 6 + secondWord.length )).catch( (error) => {
-                    m.channel.send("Error: I do not have permission to access this channel.");
-                    // console.log(error);
-                });
-                return;                   
+                if(messageContent.slice(1,5) === "echo" ) botEcho( m, client );
+
             }
-            const messageToEcho: string = messageContent.slice(6);
-            m.channel.send(messageToEcho);
+
         }
+
+        
 
     }
 });
