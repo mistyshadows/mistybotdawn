@@ -4,6 +4,7 @@ const { Client, Events, GatewayIntentBits } = require('discord.js');
 const { token }: {token:string} = require("../config.json");
 
 import { botEcho } from "./echo";
+import { botPing } from "./ping";
 
 // Create new client instance
 
@@ -31,19 +32,21 @@ client.on(Events.MessageCreate, (m: Message) => {
     if(m.content[0] === "!" && m.author.id !== "1126413831883718826" ) {
 
         const messageContent:string = m.content;
+        const commandName: string = messageContent.split(" ")[0];
 
         // Check if the member is an admin
-        if(m.member !== null) {
-            const isAdmin: boolean = m.member.permissions.has(PermissionFlagsBits.Administrator, true);
-            if (isAdmin) {
-                
-                if(messageContent.slice(1,5) === "echo" ) botEcho( m, client );
-
+        if(m.member !== null && m.member.permissions.has(PermissionFlagsBits.Administrator, true) ) {
+            
+            switch (commandName) {
+                case "!echo":
+                    botEcho( m );
+                    return;
+                case "!ping":
+                    botPing( m );
+                    return;
             }
 
         }
-
         
-
     }
 });
