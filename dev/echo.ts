@@ -1,14 +1,13 @@
-import { Client, Message, TextChannel } from "discord.js";
+import { Message, TextChannel } from "discord.js";
 
 /**
  * Bot Echo: The echo command. Sends the sent message to a channel, defaults to the channel of origin if no 
  * channel location is sent.
  * 
- * @param m: The sent message
- * @param client: The client object
+ * @param m: The sent message. Type: Message
  * @returns undefined
  */
-function botEcho( m:Message, client:Client ):undefined {
+function botEcho( m:Message ):undefined {
 
     const messageContent:string = m.content;
                 
@@ -18,7 +17,7 @@ function botEcho( m:Message, client:Client ):undefined {
     if( regex.test(secondWord) ) {
         const channelToSendsnowflake: string = secondWord.slice(2, -1);
         
-        const channelToSend: TextChannel = client.channels.cache.get( channelToSendsnowflake ) as TextChannel;
+        const channelToSend: TextChannel = m.client.channels.cache.get( channelToSendsnowflake ) as TextChannel;
         
         // Checks to see if the channel is in the same server
         if(!(m.guild !== null && m.guild.channels.cache.has( channelToSendsnowflake ))) {
