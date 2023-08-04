@@ -39,7 +39,7 @@ playerPromise.then( (resolvedPlayer) => {
 } );
 
 const searchResultsMap:Map<string,SearchResult> = new Map();
-
+const timerIdMap:Map<string,NodeJS.Timeout> = new Map();
 
 
 // Listen for a message
@@ -49,62 +49,59 @@ client.on(Events.MessageCreate, async (m: Message) => {
 
         const messageContent:string = m.content;
         const commandName: string = messageContent.split(" ")[0];
+            
+        try {
+            // Check if the member is an admin
+            if(m.member !== null && m.member.permissions.has(PermissionFlagsBits.Administrator, true) ) {
+                
+                switch (commandName) {
+                    case "!echo":
+                        botEcho( m );
+                        return;
+                    case "!ping":
+                        botPing( m );
+                        return;
+                    default:
+                        break;
+                }
 
-        // Check if the member is an admin
-        if(m.member !== null && m.member.permissions.has(PermissionFlagsBits.Administrator, true) ) {
+            }
+        
             
             switch (commandName) {
-                case "!echo":
-                    botEcho( m );
-                    return;
-                case "!ping":
-                    botPing( m );
-                    return;
+
+                // Music Commands
+                    case "!play":
+                        play(m, player);
+                        return;
+                    case "!stop":
+                        stop(m);
+                        return;
+                    case "!skip":
+                        skip(m);
+                        return;
+                    case "!playnext":
+                        playnext(m,player);
+                        return;
+                    case "!search":
+                        search(m,player,searchResultsMap,timerIdMap);
+                        return;
+                    case "!pause":
+                        pause(m);
+                        return;
+                    case "!loopqueue":
+                        loopqueue(m);
+                        return;
+                    case "!restart":
+                        restart(m,player);
+                        return;
+                // Default
                 default:
                     break;
             }
-
+        } catch (error) {
+            console.log(error);
         }
-
-        switch (commandName) {
-
-            // Music Commands
-                case "!play":
-                    play(m, player);
-                    return;
-                case "!stop":
-                    stop(m,player);
-                    return;
-                case "!skip":
-                    skip(m,player);
-                    return;
-                case "!playnext":
-                    playnext(m,player);
-                    return;
-                case "!search":
-                    const searchResults = await search(m,player);
-                    if(!m.guildId) return;
-                    if(searchResults) {
-                        searchResultsMap.set( m.guildId, searchResults );
-                    }
-                    return;
-                case "!selectTrack":
-                    selectTrack ( m, player, searchResultsMap );
-                    return;
-                case "!pause":
-                    pause(m);
-                    return;
-                case "!loopqueue":
-                    loopqueue(m);
-                    return;
-                case "!restart":
-                    restart(m,player);
-                    return;
-            // Default
-            default:
-                break;
-        }
-        
     }
 });
 
