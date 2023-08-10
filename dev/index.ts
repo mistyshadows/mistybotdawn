@@ -7,6 +7,7 @@ import { botEcho, slashBotEchoCommand } from "./echo";
 import { botPing, slashBotPingCommand } from "./ping";
 import { loopqueue, pause, play, playnext, restart, search, selectTrack, setUpPlayer, skip, slashPlayCommand, stop } from "./music";
 import { Player, SearchResult } from "discord-player";
+import { timeConverter } from "./time-code";
 
 // Create new client instance
 
@@ -94,6 +95,9 @@ client.on(Events.MessageCreate, async (m: Message) => {
                         return;
                     case "!restart":
                         restart(m,player);
+                        return;
+                    case "!time":
+                        timeConverter(m);
                         return;
                 // Default
                 default:
